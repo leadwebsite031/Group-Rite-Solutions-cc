@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GRS | Command Center</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { background: #020617; color: white; font-family: sans-serif; }
+        .crm-card { background: #0f172a; border: 1px solid #1e293b; border-radius: 1.5rem; padding: 1.5rem; }
+        .sla-urgent { color: #f87171; animation: pulse 1s infinite; }
+        @keyframes pulse { 50% { opacity: 0.5; } }
+    </style>
+</head>
+<body class="p-8">
+    <div id="lock" class="fixed inset-0 bg-slate-950 z-[9999] flex items-center justify-center">
+        <div class="bg-white p-10 rounded-3xl text-slate-900 max-w-sm w-full">
+            <h2 class="text-2xl font-black italic mb-4 uppercase">Command Access</h2>
+            <input type="password" id="pass" placeholder="Enter PIN" class="w-full p-4 bg-slate-100 rounded-xl mb-4 text-center text-2xl font-bold">
+            <button onclick="checkAuth()" class="w-full bg-blue-600 text-white py-4 rounded-xl font-black uppercase">Decrypt System</button>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto">
+        <header class="flex justify-between items-center mb-10">
+            <div>
+                <h1 class="text-3xl font-black italic uppercase">Intelligence <span class="text-blue-500">Center</span></h1>
+                <p class="text-slate-500 text-[10px] tracking-widest uppercase">KZN Operational Load</p>
+            </div>
+            <a href="index.html" class="text-xs font-bold text-slate-400 border border-slate-700 px-4 py-2 rounded-lg">View Public Site</a>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+            <div class="crm-card"><p class="text-slate-500 text-[9px] font-black uppercase mb-1">Total Pipeline</p><h3 id="stat-total" class="text-3xl font-black italic">0</h3></div>
+            <div class="crm-card"><p class="text-slate-500 text-[9px] font-black uppercase mb-1">Projected MRR</p><h3 id="stat-mrr" class="text-3xl font-black italic text-emerald-400">R0</h3></div>
+            <div class="crm-card"><p class="text-slate-500 text-[9px] font-black uppercase mb-1">Gross Value</p><h3 id="stat-val" class="text-3xl font-black italic text-blue-400">R0</h3></div>
+            <div class="crm-card"><p class="text-slate-500 text-[9px] font-black uppercase mb-1">SLA Health</p><h3 class="text-3xl font-black italic text-orange-400">Stable</h3></div>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-8 mb-10">
+            <div class="crm-card"><h4 class="text-xs font-black uppercase mb-4">Division Load Distribution</h4><canvas id="divChart" height="200"></canvas></div>
+            <div class="crm-card"><h4 class="text-xs font-black uppercase mb-4">Growth Forecast</h4><canvas id="mrrChart" height="200"></canvas></div>
+        </div>
+
+        <div class="crm-card overflow-hidden">
+            <h4 class="text-xs font-black uppercase mb-6">Live Dispatch Log</h4>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <tr class="text-[10px] text-slate-500 uppercase border-b border-slate-800">
+                        <th class="pb-4">Client</th><th class="pb-4">Division</th><th class="pb-4">SLA Time</th><th class="pb-4">Action</th>
+                    </tr>
+                    <tbody id="table-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function checkAuth() {
+            if(document.getElementById('pass').value === 'GRS2026!') {
+                document.getElementById('lock').classList.add('hidden');
+                init();
+            } else { alert("WRONG PIN"); }
+        }
+
+        let leads = JSON.parse(localStorage.getItem('grs_db')) || [];
+
+        function init() {
+            document.getElementById('stat-total').innerText = leads.length;
+            const subs = leads.filter(l => l.sub).length;
+            document.getElementById('stat-mrr').innerText = "R" + (subs * 450).toLocaleString();
+            document.getElementById('stat-val').innerText = "R" + (leads.length * 5200).toLocaleString();
+
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = leads.map((l, i) => {
+                const diff = Math.floor((new Date() - new Date(l.timestamp)) / 60000);
+                const age = diff < 60 ? diff + "m" : Math.floor(diff/60) + "h";
+                return `<tr class="border-b border-slate-800/50 text-sm">
+                    <td class="py-4 font-bold text-slate-200">${l.name}</td>
+                    <td class="py-4 font-black uppercase text-blue-500 text-[10px]">${l.service}</td>
+                    <td class="py-4 ${diff > 120 ? 'sla-urgent' : 'text-slate-400'}">${age} ago</td>
+                    <td class="py-4"><button onclick="remove(${i})" class="text-red-900 text-[10px] font-bold">CLEAR</button></td>
+                </tr>`;
+            }).reverse().join('');
+
+            render();
+        }
+
+        function remove(i) {
+            leads.splice(i, 1);
+            localStorage.setItem('grs_db', JSON.stringify(leads));
+            init();
+        }
+
+        function render() {
+            const counts = {};
+            leads.forEach(l => counts[l.service] = (counts[l.service] || 0) + 1);
+            new Chart(document.getElementById('divChart'), {
+                type: 'bar',
+                data: { labels: Object.keys(counts), datasets: [{ data: Object.values(counts), backgroundColor: '#3b82f6' }]},
+                options: { plugins: { legend: { display: false } }, scales: { y: { grid: { color: '#1e293b' } } } }
+            });
+        }
+    </script>
+</body>
+</html>
