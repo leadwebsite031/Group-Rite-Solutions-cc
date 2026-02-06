@@ -3,321 +3,156 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Group Rite Solutions CC | Enterprise Resource Portal</title>
+    <title>Group Rite Solutions CC | Professional Lead Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --grs-navy: #0f172a; --grs-blue: #2563eb; --grs-emerald: #10b981; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #1e293b; overflow: hidden; }
+        :root { --grs-blue: #2563eb; --grs-navy: #0f172a; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; overflow-x: hidden; }
         
-        /* Layout Architecture */
-        .sidebar { background: var(--grs-navy); width: 280px; height: 100vh; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-        .nav-item { margin: 4px 16px; padding: 12px 16px; border-radius: 12px; color: #94a3b8; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 12px; font-size: 0.85rem; font-weight: 600; }
-        .nav-item:hover { color: #fff; background: rgba(255,255,255,0.05); }
-        .nav-item.active { color: #fff; background: var(--grs-blue); box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3); }
+        .nav-tab { cursor: pointer; border-bottom: 3px solid transparent; transition: 0.3s; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: #94a3b8; }
+        .nav-tab:hover { color: var(--grs-blue); }
+        .nav-tab.active { color: var(--grs-blue); border-bottom-color: var(--grs-blue); }
 
-        .main-stage { height: 100vh; overflow-y: auto; flex-grow: 1; scroll-behavior: smooth; }
-        .content-view { display: none; padding: 40px; animation: fadeIn 0.4s ease-out; }
-        .content-view.active { display: block; }
+        .view-section { display: none; animation: slideUp 0.5s ease-out; }
+        .view-section.active { display: block; }
 
-        /* Component Styling */
-        .glass-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02), 0 10px 15px -3px rgba(0,0,0,0.03); }
-        .stat-card { padding: 24px; border-radius: 20px; background: white; border: 1px solid #f1f5f9; }
+        .service-card { border: 2px solid #f1f5f9; transition: 0.3s; cursor: pointer; }
+        .service-card:hover { border-color: var(--grs-blue); transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05); }
+        .service-card.selected { background: var(--grs-blue); border-color: var(--grs-blue); color: white; }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* Custom Scrollbar */
-        .main-stage::-webkit-scrollbar { width: 6px; }
-        .main-stage::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        .hero-gradient { background: radial-gradient(circle at top right, #1e293b, #0f172a); }
     </style>
 </head>
-<body class="flex">
+<body>
 
-    <aside class="sidebar flex flex-col shadow-2xl z-50">
-        <div class="p-10 text-center">
-            <img src="logo.png" alt="GRS Logo" class="w-24 h-24 mx-auto mb-4 object-contain bg-white p-2 rounded-2xl shadow-lg">
-            <h1 class="text-white font-extrabold tracking-tighter text-lg italic">GROUP RITE <span class="text-blue-500">SOLUTIONS</span></h1>
-            <p class="text-[9px] text-slate-500 font-bold uppercase tracking-[0.3em] mt-1">Enterprise Command</p>
-        </div>
-
-        <nav class="flex-grow space-y-1">
-            <div onclick="switchTab('dashboard')" id="tab-dashboard" class="nav-item active"><span>📊</span> Dashboard</div>
-            <div onclick="switchTab('dispatch')" id="tab-dispatch" class="nav-item"><span>📡</span> Site Dispatch</div>
-            <div onclick="switchTab('leads')" id="tab-leads" class="nav-item"><span>📂</span> Lead Archive</div>
-            <div onclick="switchTab('finance')" id="tab-finance" class="nav-item"><span>💰</span> Financials</div>
-            <div onclick="switchTab('team')" id="tab-team" class="nav-item"><span>👷</span> Operations</div>
-            <div onclick="switchTab('settings')" id="tab-settings" class="nav-item"><span>⚙️</span> Settings</div>
-        </nav>
-
-        <div class="p-8 mt-auto border-t border-slate-800/50">
-            <div class="bg-slate-900/50 p-4 rounded-xl border border-white/5">
-                <p class="text-[9px] text-slate-500 font-bold uppercase mb-2">Network Status</p>
-                <div class="flex items-center gap-2">
-                    <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-                    <span class="text-xs font-bold text-slate-300">Live Global Sync</span>
-                </div>
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <img src="logo.png" alt="GRS" class="h-12 w-12 object-contain">
+                <span class="font-black italic text-xl tracking-tighter uppercase text-slate-800">Group Rite <span class="text-blue-600 text-sm not-italic">CC</span></span>
+            </div>
+            <div class="hidden md:flex gap-8">
+                <div onclick="switchTab('home')" id="tab-home" class="nav-tab active py-7">Request Service</div>
+                <div onclick="switchTab('services')" id="tab-services" class="nav-tab py-7">Divisions</div>
+                <div onclick="switchTab('about')" id="tab-about" class="nav-tab py-7">Our Profile</div>
+                <div onclick="switchTab('compliance')" id="tab-compliance" class="nav-tab py-7">Compliance</div>
+                <div onclick="switchTab('projects')" id="tab-projects" class="nav-tab py-7">Projects</div>
+                <div onclick="switchTab('contact')" id="tab-contact" class="nav-tab py-7">Contact</div>
             </div>
         </div>
-    </aside>
+    </nav>
 
-    <div class="main-stage">
-        
-        <header class="h-20 bg-white/80 backdrop-blur-md sticky top-0 border-b border-slate-200 px-10 flex items-center justify-between z-40">
-            <div>
-                <h2 id="current-title" class="text-xs font-black text-slate-400 uppercase tracking-[0.3em]">Operational Dashboard</h2>
-                <p class="text-[10px] text-slate-400 font-medium" id="date-string"></p>
-            </div>
-            <div class="flex items-center gap-4">
-                <div class="h-10 w-10 bg-slate-100 rounded-full flex items-center justify-center font-bold text-slate-500 text-xs">CEO</div>
-            </div>
-        </header>
+    <section id="view-home" class="view-section active">
+        <div class="hero-gradient text-white py-20 px-6 text-center">
+            <h1 class="text-4xl md:text-6xl font-extrabold tracking-tighter mb-4">ENGINEERING <span class="text-blue-500">EXCELLENCE</span></h1>
+            <p class="text-slate-400 font-bold uppercase tracking-[0.3em] text-xs">9 Specialized Divisions • Rapid Response • South Africa</p>
+        </div>
 
-        <section id="view-dashboard" class="content-view active">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="glass-card p-8 md:col-span-2">
-                    <h3 class="font-bold text-slate-800 mb-6">Revenue & Job Velocity</h3>
-                    <canvas id="growthChart" height="120"></canvas>
-                </div>
-                <div class="glass-card p-8 flex flex-col items-center justify-center">
-                    <h3 class="text-xs font-black text-slate-400 uppercase mb-8">SLA Compliance</h3>
-                    <div class="relative w-48 h-48">
-                        <canvas id="slaChart"></canvas>
-                        <div class="absolute inset-0 flex flex-col items-center justify-center">
-                            <span id="slaVal" class="text-4xl font-black text-slate-800">0%</span>
-                            <span class="text-[9px] font-bold text-emerald-500 uppercase">Target</span>
+        <div class="max-w-5xl mx-auto -mt-16 px-6 pb-20">
+            <div class="bg-white rounded-[32px] shadow-2xl p-8 md:p-12">
+                <form id="leadSystem" class="space-y-12">
+                    <div>
+                        <p class="text-[10px] font-black uppercase text-blue-600 tracking-widest mb-6 text-center">Select Job Division</p>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4" id="jobGrid">
+                            <div class="service-card p-6 rounded-2xl text-center text-xs font-bold uppercase" onclick="selectJob(this, 'Leak Detection')">Leak Detection</div>
+                            <div class="service-card p-6 rounded-2xl text-center text-xs font-bold uppercase" onclick="selectJob(this, 'Fire Services')">Fire Services</div>
+                            <div class="service-card p-6 rounded-2xl text-center text-xs font-bold uppercase" onclick="selectJob(this, 'Hydraulic Plumbing')">Hydraulic Plumbing</div>
+                            <div class="service-card p-6 rounded-2xl text-center text-xs font-bold uppercase" onclick="selectJob(this, 'Electrical Eng')">Electrical Eng</div>
+                            <div class="service-card p-6 rounded-2xl text-center text-xs font-bold uppercase" onclick="selectJob(this, 'Civil Building')">Civil Building</div>
+                            <div class="service-card p-6 rounded-2xl text-center text-xs font-bold uppercase" onclick="selectJob(this, 'Waterproofing')">Waterproofing</div>
+                            <div class="service-card p-6 rounded-2xl text-center text-xs font-bold uppercase" onclick="selectJob(this, 'HVAC Systems')">HVAC Systems</div>
+                            <div class="service-card p-6 rounded-2xl text-center text-xs font-bold uppercase" onclick="selectJob(this, 'Steel Fab')">Steel Fab</div>
+                            <div class="service-card p-6 rounded-2xl text-center text-xs font-bold uppercase" onclick="selectJob(this, 'Site Maintenance')">Site Maintenance</div>
+                        </div>
+                        <input type="hidden" id="jobSelection" required>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Full Name / Company</label>
+                            <input type="text" id="name" required class="w-full bg-slate-50 border-none p-5 rounded-2xl font-bold outline-none ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">WhatsApp Contact</label>
+                            <input type="tel" id="phone" required class="w-full bg-slate-50 border-none p-5 rounded-2xl font-bold outline-none ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div class="md:col-span-2 space-y-2">
+                            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Site Address</label>
+                            <input type="text" id="address" required class="w-full bg-slate-50 border-none p-5 rounded-2xl font-bold outline-none ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-500">
                         </div>
                     </div>
-                </div>
-                <div class="glass-card p-8">
-                    <h3 class="text-xs font-black text-slate-400 uppercase mb-6">Service Split (9 Jobs)</h3>
-                    <canvas id="divChart" height="200"></canvas>
-                </div>
-                <div class="glass-card p-8 md:col-span-2">
-                    <h3 class="text-xs font-black text-slate-400 uppercase mb-6">Real-Time Activity</h3>
-                    <div id="activityFeed" class="space-y-4">
-                        <p class="text-slate-300 italic text-sm text-center py-10">Waiting for first lead ingestion...</p>
-                    </div>
-                </div>
-            </div>
-        </section>
 
-        <section id="view-dispatch" class="content-view">
-            <div class="max-w-4xl mx-auto glass-card p-12">
-                <h2 class="text-3xl font-black italic uppercase tracking-tighter mb-2">Initialize <span class="text-blue-600">Site Dispatch</span></h2>
-                <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-10 border-b pb-6">Engineering Resource Allocation</p>
-                <form id="leadForm" class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-black uppercase text-slate-400">Client / Company Name</label>
-                        <input type="text" id="name" required class="w-full bg-slate-50 border p-4 rounded-xl font-bold outline-none focus:ring-2 focus:ring-blue-500">
-                    </div>
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-black uppercase text-slate-400">WhatsApp / Tel</label>
-                        <input type="tel" id="phone" required class="w-full bg-slate-50 border p-4 rounded-xl font-bold outline-none focus:ring-2 focus:ring-blue-500">
-                    </div>
-                    <div class="md:col-span-2 space-y-2">
-                        <label class="text-[10px] font-black uppercase text-slate-400">Physical Site Address</label>
-                        <input type="text" id="addr" required class="w-full bg-slate-50 border p-4 rounded-xl font-bold outline-none focus:ring-2 focus:ring-blue-500">
-                    </div>
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-black uppercase text-slate-400">Select Division (9 Services)</label>
-                        <select id="division" class="w-full bg-slate-50 border p-4 rounded-xl font-bold text-blue-600 outline-none">
-                            <option>Leak Detection</option><option>Fire Services</option><option>Hydraulic Plumbing</option>
-                            <option>Electrical Eng</option><option>Civil Building</option><option>Waterproofing</option>
-                            <option>HVAC Systems</option><option>Steel Fab</option><option>Site Maintenance</option>
-                        </select>
-                    </div>
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-black uppercase text-slate-400">Job Priority</label>
-                        <select id="priority" class="w-full bg-slate-50 border p-4 rounded-xl font-bold outline-none">
-                            <option>Standard Dispatch</option><option class="text-red-500">EMERGENCY SOS</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="md:col-span-2 bg-blue-600 text-white font-black py-5 rounded-2xl uppercase tracking-[0.2em] shadow-xl hover:bg-blue-700 transition-all">Submit Lead to Command</button>
+                    <button type="submit" class="w-full bg-blue-600 text-white font-black py-6 rounded-2xl shadow-xl shadow-blue-200 hover:bg-blue-700 transition-all uppercase tracking-[0.4em] text-sm">
+                        Submit Request
+                    </button>
                 </form>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <section id="view-leads" class="content-view">
-            <div class="glass-card overflow-hidden">
-                <table class="w-full text-left border-collapse">
-                    <thead class="bg-slate-50 border-b">
-                        <tr class="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                            <th class="p-6">Client Entity</th>
-                            <th class="p-6">Division</th>
-                            <th class="p-6">Location</th>
-                            <th class="p-6">Status</th>
-                            <th class="p-6 text-right">Pipeline Value</th>
-                        </tr>
-                    </thead>
-                    <tbody id="leadTable" class="text-xs font-bold text-slate-600"></tbody>
-                </table>
-            </div>
-        </section>
+    <section id="view-services" class="view-section p-20 text-center">
+        <h2 class="text-3xl font-black uppercase italic">Our 9 Engineering Divisions</h2>
+        <p class="text-slate-500 mt-4">Detailed technical specifications for each GRS department.</p>
+    </section>
 
-        <section id="view-finance" class="content-view">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div class="glass-card p-10 bg-slate-900 text-white">
-                    <p class="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-2">Estimated Pipeline</p>
-                    <h2 class="text-5xl font-extrabold italic" id="totalValue">R 0.00</h2>
-                </div>
-                <div class="glass-card p-10 flex flex-col justify-center">
-                    <h3 class="font-bold mb-4">Export Financial Data</h3>
-                    <button onclick="exportCSV()" class="bg-emerald-500 text-white px-8 py-3 rounded-xl font-bold text-xs uppercase tracking-widest">Generate CSV Audit</button>
-                </div>
-            </div>
-        </section>
+    <section id="view-about" class="view-section p-20 text-center">
+        <h2 class="text-3xl font-black uppercase italic">Company Profile</h2>
+        <p class="text-slate-500 mt-4">Leading the industry with Group Rite Solutions CC.</p>
+    </section>
 
-        <section id="view-team" class="content-view">
-            <div class="glass-card p-10">
-                <h3 class="font-bold mb-6">Site Team Allocation</h3>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="p-6 border rounded-2xl">
-                        <p class="text-[10px] font-black text-slate-400 uppercase mb-2">Primary Team</p>
-                        <p class="text-sm font-bold">Engineering Unit A</p>
-                        <span class="text-[9px] bg-green-100 text-green-600 px-2 py-1 rounded mt-2 inline-block">AVAILABLE</span>
-                    </div>
-                </div>
-            </div>
-        </section>
+    <section id="view-compliance" class="view-section p-20 text-center">
+        <h2 class="text-3xl font-black uppercase italic">Health & Safety Compliance</h2>
+        <p class="text-slate-500 mt-4">Full COID and Safety Certification documentation.</p>
+    </section>
 
-        <section id="view-settings" class="content-view">
-            <div class="max-w-xl glass-card p-10">
-                <h3 class="font-bold mb-6 text-red-500">Danger Zone</h3>
-                <p class="text-xs text-slate-400 mb-6">Wiping data will clear all lead archives and reset the CEO dashboard to zero.</p>
-                <button onclick="clearAll()" class="border border-red-200 text-red-500 px-6 py-2 rounded-xl text-xs font-black uppercase">Clear Master Database</button>
-            </div>
-        </section>
-    </div>
+    <section id="view-projects" class="view-section p-20 text-center">
+        <h2 class="text-3xl font-black uppercase italic">Project Portfolio</h2>
+        <p class="text-slate-500 mt-4">Showcasing our industrial and commercial impact.</p>
+    </section>
+
+    <section id="view-contact" class="view-section p-20 text-center">
+        <h2 class="text-3xl font-black uppercase italic">Contact Us</h2>
+        <p class="text-slate-500 mt-4">Email: info@grouprite.co.za | Tel: 031 000 0000</p>
+    </section>
 
     <script>
-        let leads = JSON.parse(localStorage.getItem('grs_ceo_system')) || [];
-        let charts = {};
-
-        // UI NAVIGATION
+        // TAB SWITCH LOGIC
         function switchTab(tabId) {
-            document.querySelectorAll('.content-view, .nav-item').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.view-section, .nav-tab').forEach(el => el.classList.remove('active'));
             document.getElementById(`view-${tabId}`).classList.add('active');
             document.getElementById(`tab-${tabId}`).classList.add('active');
-            document.getElementById('current-title').innerText = tabId.toUpperCase() + " SYSTEM";
-            
-            if(tabId === 'dashboard') initCharts();
-            if(tabId === 'leads') renderLeads();
-            if(tabId === 'finance') updateFinance();
+            window.scrollTo(0,0);
         }
 
-        // DISPATCH ENGINE
-        document.getElementById('leadForm').onsubmit = (e) => {
+        // JOB SELECTION LOGIC
+        function selectJob(element, val) {
+            document.querySelectorAll('.service-card').forEach(c => c.classList.remove('selected'));
+            element.classList.add('selected');
+            document.getElementById('jobSelection').value = val;
+        }
+
+        // SUBMISSION LOGIC (Simulated Transmission)
+        document.getElementById('leadSystem').onsubmit = (e) => {
             e.preventDefault();
-            const newLead = {
-                name: document.getElementById('name').value,
-                phone: document.getElementById('phone').value,
-                addr: document.getElementById('addr').value,
-                div: document.getElementById('division').value,
-                priority: document.getElementById('priority').value,
-                val: 12500, // Static CEO Value Per Lead
-                date: new Date().toLocaleDateString()
+            const job = document.getElementById('jobSelection').value;
+            if(!job) return alert("Please select a division.");
+
+            const data = {
+                client: document.getElementById('name').value,
+                contact: document.getElementById('phone').value,
+                site: document.getElementById('address').value,
+                division: job,
+                timestamp: new Date().toISOString()
             };
-            leads.push(newLead);
-            localStorage.setItem('grs_ceo_system', JSON.stringify(leads));
-            alert("SATELLITE SYNC: Lead Ingested.");
-            document.getElementById('leadForm').reset();
-            switchTab('dashboard');
+
+            console.log("Lead Dispatched:", data);
+            alert("SUCCESS: Your request for " + job + " has been transmitted to Group Rite Solutions.");
+            document.getElementById('leadSystem').reset();
+            document.querySelectorAll('.service-card').forEach(c => c.classList.remove('selected'));
         };
-
-        // ANALYTICS ENGINE
-        function initCharts() {
-            const counts = {};
-            leads.forEach(l => counts[l.div] = (counts[l.div] || 0) + 1);
-
-            // GROWTH
-            const ctx1 = document.getElementById('growthChart').getContext('2d');
-            if(charts.growth) charts.growth.destroy();
-            charts.growth = new Chart(ctx1, {
-                type: 'line',
-                data: {
-                    labels: ['Week 1', 'Week 2', 'Week 3', 'Active'],
-                    datasets: [{
-                        label: 'Velocity',
-                        data: [0, 0, 0, leads.length],
-                        borderColor: '#2563eb',
-                        fill: true,
-                        backgroundColor: 'rgba(37, 99, 235, 0.05)',
-                        tension: 0.4
-                    }]
-                },
-                options: { plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false } } } }
-            });
-
-            // SLA
-            const slaVal = leads.length > 0 ? 85 : 0;
-            document.getElementById('slaVal').innerText = slaVal + "%";
-            const ctx2 = document.getElementById('slaChart').getContext('2d');
-            if(charts.sla) charts.sla.destroy();
-            charts.sla = new Chart(ctx2, {
-                type: 'doughnut',
-                data: { datasets: [{ data: [slaVal, 100-slaVal], backgroundColor: ['#10b981', '#f1f5f9'], borderWidth: 0 }] },
-                options: { cutout: '85%', plugins: { tooltip: { enabled: false } } }
-            });
-
-            // BARS
-            const ctx3 = document.getElementById('divChart').getContext('2d');
-            if(charts.div) charts.div.destroy();
-            charts.div = new Chart(ctx3, {
-                type: 'bar',
-                data: {
-                    labels: Object.keys(counts).length ? Object.keys(counts) : ['None'],
-                    datasets: [{ data: Object.values(counts).length ? Object.values(counts) : [0], backgroundColor: '#2563eb', borderRadius: 8 }]
-                },
-                options: { plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false }, ticks: { font: { size: 8 } } } } }
-            });
-
-            // ACTIVITY FEED
-            const feed = document.getElementById('activityFeed');
-            if(leads.length > 0) {
-                feed.innerHTML = leads.slice(-3).map(l => `
-                    <div class="flex justify-between items-center p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                        <div><p class="font-bold text-slate-800 text-xs">${l.name}</p><p class="text-[9px] text-slate-400 font-bold uppercase">${l.div}</p></div>
-                        <span class="text-[9px] font-black text-blue-500 bg-blue-50 px-3 py-1 rounded-lg">LIVE</span>
-                    </div>
-                `).reverse().join('');
-            }
-        }
-
-        function renderLeads() {
-            const table = document.getElementById('leadTable');
-            table.innerHTML = leads.map((l, i) => `
-                <tr class="border-b hover:bg-slate-50 transition">
-                    <td class="p-6"><div>${l.name}</div><div class="text-[9px] text-slate-400 font-normal">${l.date}</div></td>
-                    <td class="p-6 text-blue-600 uppercase font-black italic text-[10px]">${l.div}</td>
-                    <td class="p-6 text-[10px] text-slate-400 font-bold">${l.addr}</td>
-                    <td class="p-6"><span class="px-2 py-1 bg-slate-100 rounded text-[9px] uppercase">${l.priority}</span></td>
-                    <td class="p-6 text-right font-mono text-emerald-600">R ${l.val.toLocaleString()}</td>
-                </tr>
-            `).reverse().join('');
-        }
-
-        function updateFinance() {
-            const total = leads.reduce((acc, curr) => acc + curr.val, 0);
-            document.getElementById('totalValue').innerText = `R ${total.toLocaleString()}.00`;
-        }
-
-        function exportCSV() {
-            let csv = "Name,Phone,Division,Value\n";
-            leads.forEach(l => csv += `${l.name},${l.phone},${l.div},${l.val}\n`);
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = "GRS_Financial_Audit.csv";
-            a.click();
-        }
-
-        function clearAll() { if(confirm("Wipe all CEO Data?")) { localStorage.removeItem('grs_ceo_system'); location.reload(); } }
-
-        // INITIALIZE
-        document.getElementById('date-string').innerText = new Date().toDateString();
-        initCharts();
     </script>
 </body>
 </html>
